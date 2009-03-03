@@ -1,0 +1,5 @@
+Manifest.txt
+Rakefile
+fuzzy_hash.gemspec
+lib/fuzzy_hash.rb
+spec/lookup_spec.rb

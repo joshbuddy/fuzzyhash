@@ -1,0 +1,17 @@
+= Fuzzy Hash
+
+This is useful when you want to have a lookup table that can either contain strings or regexes.
+For instance, you might want a catch all for certain regexes that perform a certain logic.
+
+  >> hash = FuzzyHash.new
+  >> hash[/^\d+$/] = 'number'
+  >> hash[/.*/] = 'something'
+  >> hash['chunky'] = 'bacon'
+  >> hash['foo'] = 'vader'
+  
+  >> hash['foo']
+  << 'vader'
+  >> hash['food']
+  << 'something'
+  >> hash['123']
+  << 'number'
