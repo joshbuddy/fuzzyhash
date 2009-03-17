@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.date = %q{2009-03-03}
   s.email = %q{joshbuddy@gmail.comjoshbuddy@gmail.com}
   s.extra_rdoc_files = ["Manifest.txt"]
-  s.files = ["Manifest.txt", "Rakefile", "fuzzy_hash.gemspec", "lib/fuzzy_hash.rb", "spec/lookup_spec.rb"]
+  s.files = ["Manifest.txt", "Rakefile", "fuzzy_hash.gemspec", "lib/fuzzy_hash.rb", "spec/fuzzy_hash_spec.rb"]
   s.has_rdoc = true
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
