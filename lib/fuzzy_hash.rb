@@ -69,7 +69,7 @@ class FuzzyHash
   end
   
   def [](key)
-    @hash[key] || regex_lookup(key)
+    @hash.key?(key) ? @hash[key] : regex_lookup(key)
   end
   
   private

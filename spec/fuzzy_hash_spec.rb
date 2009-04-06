@@ -29,6 +29,16 @@ describe "Fuzzy hash" do
     l[nil].should == 'qwe2'
   end
 
+  it "should allow boolean keys" do
+    l = FuzzyHash.new
+    l[false] = 'false'
+    l[true] = 'true'
+    l[/.*/] = 'everything else'
+    l[true].should == 'true'
+    l[false].should == 'false'
+    l['false'].should == 'everything else'
+  end
+
   it "should pick between the correct regex" do
     hash = FuzzyHash.new
     hash[/^\d+$/] = 'number'
