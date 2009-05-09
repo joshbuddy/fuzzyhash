@@ -1,12 +1,11 @@
 class FuzzyHash
   
-  Version = '0.0.1'
-  
-  def initialize
-    @hash = {}
+  def initialize(init_hash = nil)
     @regexes = []
     @hash_reverse = {}
     @regexes_reverse = {}
+    @hash = {}
+    init_hash.each{ |key,value| self[key] = value } if init_hash
   end
   
   def clear
