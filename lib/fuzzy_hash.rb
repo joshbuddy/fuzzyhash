@@ -68,7 +68,15 @@ class FuzzyHash
   end
   
   def [](key)
-    @hash.key?(key) ? @hash[key] : regex_lookup(key)
+    @hash.key?(key) ? @hash[key] : (lookup = regex_lookup(key)) && lookup && lookup.first
+  end
+  
+  def match_with_result(key)
+    if @hash.key?(key)
+      [@hash[key], key]
+    else
+      regex_lookup(key)
+    end
   end
   
   private
@@ -79,7 +87,7 @@ class FuzzyHash
   def regex_lookup(key)
     if !@regexes.empty? && key.is_a?(String) && (data = regex_test.match(key))
       (data_array = data.to_a).each_index do |i|
-        break @regexes[i].last if data_array.at(i+1)
+        break [@regexes[i].last, data_array.at(i+1)] if data_array.at(i+1)
       end
     end
   end

@@ -14,6 +14,12 @@ describe "Fuzzy hash" do
     l['asdqweasd'].should == 'qwe'
   end
 
+  it "should accept regexs too with the match" do
+    l = FuzzyHash.new
+    l[/asd.*/] = 'qwe'
+    l.match_with_result('asdqweasd').should == ['qwe', 'asdqweasd']
+  end
+
   it "should prefer string to regex matches" do
     l = FuzzyHash.new
     l['asd'] = 'qwe2'
