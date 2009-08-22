@@ -109,4 +109,10 @@ describe "Fuzzy hash" do
     l_1.should == l_2
   end
 
+  it "should return the value when adding the value" do
+    h = FuzzyHash.new
+    (h[/asd/] = '123').should == '123'
+    (h['qwe'] = '123').should == '123'
+  end
+
 end

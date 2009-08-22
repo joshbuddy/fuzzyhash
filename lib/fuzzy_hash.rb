@@ -16,6 +16,7 @@ class FuzzyHash
   end
   
   def ==(o)
+    o.is_a?(FuzzyHash)
     o.instance_variable_get(:@hash) == @hash &&
     o.instance_variable_get(:@regexes) == @regexes
   end
@@ -51,6 +52,7 @@ class FuzzyHash
       @hash[key] = value
       @hash_reverse[value] = key
     end
+    value
   end
   
   def replace(src, dest)
