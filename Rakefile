@@ -12,6 +12,7 @@ begin
   
   Jeweler::RubyforgeTasks.new do |rubyforge|
     rubyforge.doc_task = "rdoc"
+    rubyforge.remote_doc_path = ''
   end
   
 rescue LoadError
