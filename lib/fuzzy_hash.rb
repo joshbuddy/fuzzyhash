@@ -15,6 +15,12 @@ class FuzzyHash
     @regexes_reverse.clear
   end
   
+  def size
+    @hash.size + @regexes.size
+  end
+  alias_method :count, :size
+  
+  
   def ==(o)
     o.is_a?(FuzzyHash)
     o.instance_variable_get(:@hash) == @hash &&
@@ -83,14 +89,25 @@ class FuzzyHash
   
   private
   def regex_test
-    @regex_test ||= Regexp.new(@regexes.collect{|r| "(#{r[0]})"} * '|')
+    unless @regex_test
+      @regex_test = Object.new
+      @regex_test.instance_variable_set(:'@regexes', @regexes)
+      method = "
+        def match(str)
+          case str
+      "
+      @regexes.each_with_index do |reg, index|
+        method << "when #{reg.first.inspect}: [@regexes[#{index}][1], str]\n"
+      end
+      method << "end\nend\n"
+      @regex_test.instance_eval method
+    end
+    @regex_test
   end
   
   def regex_lookup(key)
-    if !@regexes.empty? && key.is_a?(String) && (data = regex_test.match(key))
-      (data_array = data.to_a).each_index do |i|
-        break [@regexes[i].last, data_array.at(i+1)] if data_array.at(i+1)
-      end
+    if !@regexes.empty? && key.is_a?(String) && (value = regex_test.match(key))
+      value
     end
   end
   
