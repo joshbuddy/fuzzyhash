@@ -10,6 +10,7 @@ begin
     s.rubyforge_project = 'fuzzyhash' # This line would be new
   end
   
+  Jeweler::GemcutterTasks.new
   Jeweler::RubyforgeTasks.new do |rubyforge|
     rubyforge.doc_task = "rdoc"
     rubyforge.remote_doc_path = ''
