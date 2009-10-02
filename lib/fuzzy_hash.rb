@@ -1,13 +1,14 @@
 require 'set'
 
 class FuzzyHash
-  
-  def self.always_fuzzy(init_hash)
+
+  def self.always_fuzzy(init_hash = nil)
     hash = new(init_hash)
     hash.classes_to_fuzz = nil    
     hash
   end
   
+  attr_accessor :classes_to_fuzz
   
   def initialize(init_hash = nil, classes_to_fuzz = nil)
     @fuzzies = []
@@ -98,8 +99,7 @@ class FuzzyHash
   end
   
   private
-  
-  attr_reader :fuzzies, :hash_reverse, :fuzzies_reverse, :hash, :classes_to_fuzz
+  attr_reader :fuzzies, :hash_reverse, :fuzzies_reverse, :hash
   attr_writer :fuzz_test
   
   def reset_fuzz_test!
@@ -118,13 +118,14 @@ class FuzzyHash
         method << "when #{reg.first.inspect}: [@fuzzies[#{index}][1], str]\n"
       end
       method << "end\nend\n"
+      
       @fuzz_test.instance_eval method
     end
     @fuzz_test
   end
   
   def fuzzy_lookup(key)
-    if !fuzzies.empty? && key.is_a?(String) && (value = fuzz_test.match(key))
+    if !fuzzies.empty? && (value = fuzz_test.match(key))
       value
     end
   end

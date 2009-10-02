@@ -45,6 +45,19 @@ describe "Fuzzy hash" do
     l['false'].should == 'everything else'
   end
 
+  it "always fuzzy should accept .. well.. anything" do
+    l = FuzzyHash.always_fuzzy
+    l[1..3] = '1 to 3'
+    l[4] = 'four'
+    l[5..10] = '5 and up'
+    l[/.*/] = 'whatev'
+    
+    l[2].should  == '1 to 3'
+    l[4].should  == 'four'
+    l[8].should  == '5 and up'
+    l['something'].should == 'whatev'
+  end
+
   it "should pick between the correct regex" do
     hash = FuzzyHash.new
     hash[/^\d+$/] = 'number'
