@@ -62,11 +62,15 @@ class FuzzyHash
   
   def []=(key, value)
     if classes_to_fuzz.nil? || classes_to_fuzz.include?(key.class)
+      fuzzies.delete_if{|f| f.first.hash == key.hash}
+      fuzzies_reverse.delete_if{|k, v| v.hash == key.hash}
+
       fuzzies << [key, value]
       reset_fuzz_test!
       fuzzies_reverse[value] = [fuzzies.size - 1, key, value]
     else
       hash[key] = value
+      hash_reverse.delete_if{|k,v| v.hash == key.hash}
       hash_reverse[value] = key
     end
     value

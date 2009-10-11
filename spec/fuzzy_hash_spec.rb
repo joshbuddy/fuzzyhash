@@ -8,9 +8,23 @@ describe "Fuzzy hash" do
     l['asd'].should == 'qwe'
   end
   
+  it "should accept strings, but the second time you set the same string, it should overwrite" do
+    l = FuzzyHash.new
+    l['asd'] = 'asd'
+    l['asd'] = 'qwe'
+    l['asd'].should == 'qwe'
+  end
+
   it "should accept regexs too" do
     l = FuzzyHash.new
     l[/asd.*/] = 'qwe'
+    l['asdqweasd'].should == 'qwe'
+  end
+
+  it "should accept regexs too, but the second time you set the same regex, it should overwrite" do
+    l = FuzzyHash.new
+    l[/asd/] = 'asd'
+    l[/asd/] = 'qwe'
     l['asdqweasd'].should == 'qwe'
   end
 
