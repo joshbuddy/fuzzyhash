@@ -14,6 +14,7 @@ class FuzzyHash
     @fuzzies = []
     @hash_reverse = {}
     @fuzzies_reverse = {}
+    @fuzzy_hash = {}
     @hash = {}
     @classes_to_fuzz = classes_to_fuzz || [Regexp]
     @classes_to_fuzz = Set.new(@classes_to_fuzz)
@@ -44,7 +45,7 @@ class FuzzyHash
   end
   
   def keys
-    hash.keys + fuzzies.collect{|r| r.first}
+    hash.keys + fuzzy_hash.keys
   end
   
   def values
@@ -63,8 +64,10 @@ class FuzzyHash
   def []=(key, value)
     if classes_to_fuzz.nil? || classes_to_fuzz.include?(key.class)
       fuzzies.delete_if{|f| f.first.hash == key.hash}
-      fuzzies_reverse.delete_if{|k, v| v.hash == key.hash}
+      fuzzies_reverse.delete_if{|k, v| v[1].hash == key.hash}
+      hash_reverse.delete_if{|k,v| v.hash == key.hash}
 
+      fuzzy_hash[key] = value
       fuzzies << [key, value]
       reset_fuzz_test!
       fuzzies_reverse[value] = [fuzzies.size - 1, key, value]
@@ -91,7 +94,9 @@ class FuzzyHash
   end
   
   def [](key)
-    hash.key?(key) ? hash[key] : (lookup = fuzzy_lookup(key)) && lookup && lookup.first
+    (hash.key?(key) && hash[key])  ||
+      ((lookup = fuzzy_lookup(key)) && lookup && lookup.first) ||
+      fuzzy_hash[key]
   end
   
   def match_with_result(key)
@@ -103,7 +108,7 @@ class FuzzyHash
   end
   
   private
-  attr_reader :fuzzies, :hash_reverse, :fuzzies_reverse, :hash
+  attr_reader :fuzzies, :hash_reverse, :fuzzies_reverse, :hash, :fuzzy_hash
   attr_writer :fuzz_test
   
   def reset_fuzz_test!
@@ -119,10 +124,9 @@ class FuzzyHash
           case str
       "
       fuzzies.each_with_index do |reg, index|
-        method << "when #{reg.first.inspect}: [@fuzzies[#{index}][1], str]\n"
+        method << "when #{reg.first.inspect}: [@fuzzies[#{index}][1], Regexp.last_match(0)]\n"
       end
       method << "end\nend\n"
-      
       @fuzz_test.instance_eval method
     end
     @fuzz_test
