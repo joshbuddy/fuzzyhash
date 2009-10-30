@@ -4,12 +4,12 @@ class FuzzyHash
 
   def self.always_fuzzy(init_hash = nil)
     hash = new(init_hash)
-    hash.classes_to_fuzz = nil    
+    hash.classes_to_fuzz = nil
     hash
   end
-  
+
   attr_accessor :classes_to_fuzz
-  
+
   def initialize(init_hash = nil, classes_to_fuzz = nil)
     @fuzzies = []
     @hash_reverse = {}
@@ -20,47 +20,47 @@ class FuzzyHash
     @classes_to_fuzz = Set.new(@classes_to_fuzz)
     init_hash.each{ |key,value| self[key] = value } if init_hash
   end
-  
+
   def clear
     hash.clear
     fuzzies.clear
     hash_reverse.clear
     fuzzies_reverse.clear
   end
-  
+
   def size
     hash.size + fuzzies.size
   end
   alias_method :count, :size
-  
-  
+
+
   def ==(o)
     o.is_a?(FuzzyHash)
     o.send(:hash) == hash &&
     o.send(:fuzzies) == fuzzies
   end
-  
+
   def empty?
     hash.empty? && fuzzies.empty?
   end
-  
+
   def keys
     hash.keys + fuzzy_hash.keys
   end
-  
+
   def values
     hash.values + fuzzies.collect{|r| r.last}
   end
-  
+
   def each
     hash.each{|k,v| yield k,v }
     fuzzies.each{|v| yield v.first, v.last }
   end
-  
+
   def delete_value(value)
     hash.delete(hash_reverse[value]) || ((rr = fuzzies_reverse[value]) && fuzzies.delete_at(rr[0]))
   end
-  
+
   def []=(key, value)
     if classes_to_fuzz.nil? || classes_to_fuzz.include?(key.class)
       fuzzies.delete_if{|f| f.first.hash == key.hash}
@@ -78,7 +78,7 @@ class FuzzyHash
     end
     value
   end
-  
+
   def replace(src, dest)
     if hash_reverse.key?(src)
       key = hash_reverse[src]
@@ -92,13 +92,13 @@ class FuzzyHash
       fuzzies_reverse[dest] = [rkey[0], rkey[1], dest]
     end
   end
-  
+
   def [](key)
     (hash.key?(key) && hash[key])  ||
       ((lookup = fuzzy_lookup(key)) && lookup && lookup.first) ||
       fuzzy_hash[key]
   end
-  
+
   def match_with_result(key)
     if hash.key?(key)
       [hash[key], key]
@@ -106,36 +106,36 @@ class FuzzyHash
       fuzzy_lookup(key)
     end
   end
-  
+
   private
   attr_reader :fuzzies, :hash_reverse, :fuzzies_reverse, :hash, :fuzzy_hash
   attr_writer :fuzz_test
-  
+
   def reset_fuzz_test!
     self.fuzz_test = nil
   end
-  
+
   def fuzz_test
     unless @fuzz_test
       @fuzz_test = Object.new
       @fuzz_test.instance_variable_set(:'@fuzzies', fuzzies)
       method = "
         def match(str)
-          case str
+          case str\n
       "
       fuzzies.each_with_index do |reg, index|
-        method << "when #{reg.first.inspect}: [@fuzzies[#{index}][1], Regexp.last_match(0)]\n"
+        method << "when #{reg.first.inspect}; [@fuzzies[#{index}][1], Regexp.last_match(0)];"
       end
       method << "end\nend\n"
       @fuzz_test.instance_eval method
     end
     @fuzz_test
   end
-  
+
   def fuzzy_lookup(key)
     if !fuzzies.empty? && (value = fuzz_test.match(key))
       value
     end
   end
-  
+
 end
