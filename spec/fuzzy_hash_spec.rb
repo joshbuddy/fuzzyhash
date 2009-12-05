@@ -34,6 +34,12 @@ describe "Fuzzy hash" do
     l.match_with_result('asdqweasd').should == ['qwe', 'asdqweasd']
   end
 
+  it "should accept regexs that match the whole strong too with the match" do
+    l = FuzzyHash.new
+    l[/asd/] = 'qwe'
+    l.match_with_result('asd').should == ['qwe', 'asd']
+  end
+
   it "should prefer string to regex matches" do
     l = FuzzyHash.new
     l['asd'] = 'qwe2'
@@ -57,19 +63,6 @@ describe "Fuzzy hash" do
     l[true].should == 'true'
     l[false].should == 'false'
     l['false'].should == 'everything else'
-  end
-
-  it "always fuzzy should accept .. well.. anything" do
-    l = FuzzyHash.always_fuzzy
-    l[1..3] = '1 to 3'
-    l[4] = 'four'
-    l[5..10] = '5 and up'
-    l[/.*/] = 'whatev'
-    
-    l[2].should  == '1 to 3'
-    l[4].should  == 'four'
-    l[8].should  == '5 and up'
-    l['something'].should == 'whatev'
   end
 
   it "should pick between the correct regex" do
@@ -104,7 +97,7 @@ describe "Fuzzy hash" do
     l[/qwe.*/] = 'qwe2'
     l['asd'] = 'qwe'
     l['zxc'] = 'qwe'
-    ([/qwe.*/,'asd','zxc'] & l.keys).size.should == 3
+    l.keys.size.should == 3
   end
 
   it "should iterate through the values" do

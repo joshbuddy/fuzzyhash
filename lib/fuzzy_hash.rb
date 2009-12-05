@@ -2,22 +2,12 @@ require 'set'
 
 class FuzzyHash
 
-  def self.always_fuzzy(init_hash = nil)
-    hash = new(init_hash)
-    hash.classes_to_fuzz = nil
-    hash
-  end
-
-  attr_accessor :classes_to_fuzz
-
-  def initialize(init_hash = nil, classes_to_fuzz = nil)
+  def initialize(init_hash = nil)
     @fuzzies = []
     @hash_reverse = {}
     @fuzzies_reverse = {}
     @fuzzy_hash = {}
     @hash = {}
-    @classes_to_fuzz = classes_to_fuzz || [Regexp]
-    @classes_to_fuzz = Set.new(@classes_to_fuzz)
     init_hash.each{ |key,value| self[key] = value } if init_hash
   end
 
@@ -62,10 +52,10 @@ class FuzzyHash
   end
 
   def []=(key, value)
-    if classes_to_fuzz.nil? || classes_to_fuzz.include?(key.class)
-      fuzzies.delete_if{|f| f.first.hash == key.hash}
-      fuzzies_reverse.delete_if{|k, v| v[1].hash == key.hash}
-      hash_reverse.delete_if{|k,v| v.hash == key.hash}
+    if Regexp === key
+      fuzzies.delete_if{|f| f.first.inspect.hash == key.inspect.hash}
+      fuzzies_reverse.delete_if{|k, v| v[1].inspect.hash == key.inspect.hash}
+      hash_reverse.delete_if{|k,v| v.inspect.hash == key.inspect.hash}
 
       fuzzy_hash[key] = value
       fuzzies << [key, value]
